@@ -1,0 +1,34 @@
+{
+    "name": "Trade Auto",
+    "version": "1.0",
+    "description": "Auto Trading Extension",
+    "manifest_version": 2,
+    "background": {
+        "scripts": [
+            "background.js"
+        ],
+        "persistent": false
+    },
+    "permissions": [
+        "activeTab",
+        "declarativeContent",
+        "storage"
+    ],
+    "page_action": {
+        "default_popup": "popup.html"
+    },
+    "optional_permissions": [
+        "tabs"
+    ],
+    "options_page": "options.html",
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
+    ]
+}
