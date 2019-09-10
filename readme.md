@@ -12,6 +12,8 @@ require('modname')
 While debugging in vs code make sure the file we are debugging is placed in main in package.json
 
 to debug idn chrome use `npm run debug` configured.
+    -> open `chrome://inspect`  there you can see inspect devices
+
 
 use `module.exports` to expose ur functions as a module, see in utilities.js
 
