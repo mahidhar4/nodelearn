@@ -154,7 +154,7 @@ function buyShares(siteInfoInp, currentPrice, elemItem, callbackfn) {
 
                         document.getElementById("btnOk_Confirm").click();
 
-                        tab5ClickMethod(siteInfoInp);
+                        tab5ClickMethod(siteInfoInp, callbackfn);
                     }, 2500);
 
                 }, 500);
@@ -167,7 +167,7 @@ function buyShares(siteInfoInp, currentPrice, elemItem, callbackfn) {
     }, 1500);
 }
 
-function tab5ClickMethod(siteInfoInp) {
+function tab5ClickMethod(siteInfoInp, callbackfn) {
     document.getElementById("tab5").children[0].click();
 
     tryMe("#otherReports_table_tbody #spnCMP_" + siteInfoInp.companyCode, function () {
@@ -181,9 +181,27 @@ function tab5ClickMethod(siteInfoInp) {
         {
             //finding sqroff btn
             eleConsider.parentElement.parentElement.querySelector("td.pR5 .blue_btn.withdraw.fL").click();
-        }
 
-        setTimeout(callbackfn, 2500);
+            tryMe("#div_SqrOffPopUp #sqrOffDiv .btnDiv .blue_btn", function () {
+
+                document.querySelector("#div_SqrOffPopUp #sqrOffDiv .btnDiv .blue_btn").click();
+
+                tryMe("#btnOk_Confirm", function () {
+
+                    document.getElementById("btnOk_Confirm").click();
+
+                    document.getElementById("tab1").children[0].click();
+
+                    setTimeout(callbackfn, 2500);
+
+                });
+
+            })
+
+
+        }
+        else
+            setTimeout(callbackfn, 2500);
 
     });
 

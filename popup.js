@@ -25,9 +25,7 @@ document.getElementById('navigateme').onclick = function () {
 //to naviate to the site and execute script
 document.getElementById("executeScriptStart").onclick = function () {
 
-  navigateMeMan(function () {
-    chrome.runtime.sendMessage("tradestart");
-  });
+  chrome.runtime.sendMessage("tradestart");
 };
 
 document.getElementById("login").onclick = function () {
