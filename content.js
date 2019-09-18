@@ -1,67 +1,210 @@
 
+var intervalId = undefined;
 
 function TradeStart() {
 
-    if (window.location.href.indexOf("https://trade.angelbroking.com/") < 0)
-        window.location.assign('https://trade.angelbroking.com/');
+    chrome.storage.sync.get('siteInfo', function (data) {
 
-    setTimeout(function () {
+        var infoSaved = data.siteInfo;
 
+        if (infoSaved != null && infoSaved != undefined && infoSaved != "") {
 
-        if (document.getElementById('loginBtn') != null) {
-            document.getElementById('txtUserID').value = 's248381';
-            document.getElementById('txtTradingPassword').value = 'Balaji@123';
-            document.getElementById('loginBtn').click();
-        }
+            var siteInfoInp = JSON.parse(infoSaved);
 
-        setTimeout(function () {
+            if (!document.getElementById("tab1").classList.contains("activeTab")) {
+                tab5ClickMethod(siteInfoInp);
+                return;
+            }
 
-            if (window.location.href.indexOf("https://trade.angelbroking.com/trade/trading/index?flag=mw") < 0)
-                window.location.assign('https://trade.angelbroking.com/trade/trading/index?flag=mw');
+            intervalId = setTimeout(function (siteInfo) {
 
-            setTimeout(function () {
+                // "companyCode": "",
+                // "sellAtProfitPercent": "",
+                // "sellAtLossProfitPercent": ""
 
-                setInterval(function () {
+                console.log("started interval0");
 
-                    var collection = document.querySelectorAll("#tbl_Angel_W td div a");
-                    var list = ["GAIL", "PNB"];
+                // var collection = document.querySelectorAll("#tbl_Angel_W td div a");
 
-                    collection.forEach(function (item) {
+                var collection = document.querySelectorAll("#tbl_Angel_W #ltrate_" + siteInfo.companyCode);
 
-                        var codeItem = item.getAttribute("onclick")
-                        .toString().split(',')[3].replace(/\'/ig, "").replace(/ /ig, "");
+                var list = [siteInfo.companyCode];
+                var anyItemFound = false;
 
-                        if (list.includes(codeItem)) {
+                collection.forEach(function (item) {
 
-                            var ltrRate = item.parentElement.parentElement.nextSibling.innerText;
+                    // var codeItem = item.getAttribute("onclick")
+                    //     .toString().split(',')[3].replace(/\'/ig, "").replace(/ /ig, "");
 
-                            var newItem = { "code": codeItem, "ltrrate": ltrRate, "timestamp": new Date().getTime() };
+                    var codeItem = item.getAttribute("id").split("_")[1];
 
-                            var prevArray = localStorage.getItem(codeItem);
+                    if (list.includes(codeItem)) {
 
-                            if (prevArray === null || prevArray === undefined) prevArray = [];
-                            else prevArray = JSON.parse(prevArray);
+                        anyItemFound = true;
+                        // var ltrRate = item.parentElement.parentElement.nextSibling.innerText;
 
+                        var ltrRate = item.innerText;
 
-                            if (prevArray.length > 20) prevArray = [];
+                        ltrRate = parseFloat(ltrRate);
 
+                        var newItem = { "code": codeItem, "ltrrate": ltrRate, "timestamp": new Date().getTime() };
 
+                        var prevArray = localStorage.getItem(codeItem);
+
+                        if (prevArray === null || prevArray === undefined) prevArray = [];
+
+                        else prevArray = JSON.parse(prevArray);
+
+                        if (prevArray.length > 20) prevArray = [];
+
+                        //current interval price
+                        var currentPrice = ltrRate;
+
+                        if (prevArray.length > 0) {
+
+                            //getting latest before interval price
+                            var prevPrice = prevArray[prevArray.length - 1].ltrrate;
+
+                            var calcPrice = prevPrice + (prevPrice * parseFloat(siteInfo.differenceValueWithPrevRecord) / 100);
+
+                            // currentPrice = 67.01;
+
+                            if (calcPrice <= currentPrice) {
+
+                                console.log("Buy the Share Now");
+
+                                buyShares(siteInfo, currentPrice, item, function () {
+
+                                    prevArray.push(newItem);
+
+                                    localStorage.setItem(codeItem, JSON.stringify(prevArray));
+
+                                    TradeStart();
+
+                                });
+
+                            }
+                        }
+                        else {
                             prevArray.push(newItem);
-
 
                             localStorage.setItem(codeItem, JSON.stringify(prevArray));
 
+                            TradeStart();
 
                         }
+                    }
 
-                    });
+                });
 
-                }, 2000);
+                if (!anyItemFound) TradeStart();
 
-            }, 5000);
+            }, (siteInfoInp.intervalCheck ?
+                (isNaN(parseInt(siteInfoInp.intervalCheck)) ? null
+                    : parseInt(siteInfoInp.intervalCheck)) : null) || 2000,
+                siteInfoInp);
 
-        }, 3000);
+        }
+        else {
+            alert("Please Configure User Info In Extension options");
+        }
 
-    }, 3000);
+    });
+
 }
+
+
+
+function buyShares(siteInfoInp, currentPrice, elemItem, callbackfn) {
+
+    // elemItem.parentElement.parentElement.parentElement.click();//wen anchor tag
+    elemItem.parentElement.click();//wen td
+
+    var meForProduct = siteInfoInp.selProductType || 'AMF';
+
+    document.querySelector("#tabs .fR.blue_btn").click();
+
+    tryMe("#BuySellMainDiv", function () {
+
+        tryMe(`#BuySellDiv #ddlProductType [data-prodtype='${meForProduct}']`, function () {
+
+            document.querySelector(`#BuySellDiv #ddlProductType [data-prodtype='${meForProduct}']`).click();
+
+            document.querySelector("#BuySellDiv #ddlPriceType [data-prctype='2']").click();
+
+            let { walletBalance, walletQntyMultiplier } = siteInfoInp;
+
+            walletBalance = parseFloat(walletBalance);
+
+            walletQntyMultiplier = parseInt(walletQntyMultiplier);
+
+            var Quantity = Math.ceil(walletBalance * walletQntyMultiplier / currentPrice);
+
+            document.querySelector("#BuySellDiv #txtQuantity").value = Quantity;
+
+            document.querySelector("#BuySellDiv #btnSubmitOrder").click();
+
+            tryMe("#ConfirmOrderDiv .confirmOrderTable", function () {
+
+                tryMe("#ConfirmOrderDiv #btnConfirm", function () {
+
+                    document.getElementById("btnConfirm").click();
+
+                    tryMe("#btnOk_Confirm", function () {
+
+                        document.getElementById("btnOk_Confirm").click();
+
+                        tab5ClickMethod(siteInfoInp);
+                    }, 2500);
+
+                }, 500);
+
+            }, 200)
+
+
+        }, 1800);
+
+    }, 1500);
+}
+
+function tab5ClickMethod(siteInfoInp) {
+    document.getElementById("tab5").children[0].click();
+
+    tryMe("#otherReports_table_tbody #spnCMP_" + siteInfoInp.companyCode, function () {
+
+        var eleConsider = document.querySelector("#otherReports_table_tbody #spnCMP_" + siteInfoInp.companyCode);
+        var valueOf = eleConsider.innerText;
+
+        valueOf = parseFloat(valueOf);
+
+        if (valueOf > 0)//need to chsange
+        {
+            //finding sqroff btn
+            eleConsider.parentElement.parentElement.querySelector("td.pR5 .blue_btn.withdraw.fL").click();
+        }
+
+        setTimeout(callbackfn, 2500);
+
+    });
+
+}
+
+function tryMe(elementId, cb, timer) {
+
+    var elements = document.querySelector(elementId);
+
+    if (elements == null || !meVisible(elements)) {
+        window.requestAnimationFrame(function () {
+            tryMe(elementId, cb);
+        });
+    } else {
+        meVisible(elements) ? setTimeout(cb, timer || 2000) : tryMe(elementId, cb);
+    }
+};
+
+function meVisible(elem) {
+    return !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
+}
+
+
 TradeStart();

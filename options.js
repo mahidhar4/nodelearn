@@ -1,15 +1,64 @@
-let page = document.getElementById('buttonDiv');
-const kButtonColors = ['#3aa757', '#e8453c', '#f9bb2d', '#4688f1', 'red', 'green'];
-function constructOptions(kButtonColors) {
-    for (let item of kButtonColors) {
-        let button = document.createElement('button');
-        button.style.backgroundColor = item;
-        button.addEventListener('click', function () {
-            chrome.storage.sync.set({ color: item }, function () {
-                console.log('color is ' + item);
-            })
-        });
-        page.appendChild(button);
-    }
+
+
+
+function loadPrevDetails() {
+
+    chrome.storage.sync.get('siteInfo', function (data) {
+        var infoSaved = data.siteInfo;
+        if (infoSaved != null && infoSaved != undefined && infoSaved != "") {
+            infoSaved = JSON.parse(infoSaved);
+
+            var page = document.getElementById("frmMyDetails");
+
+            for (const key in infoSaved) {
+                if (infoSaved.hasOwnProperty(key)) {
+                    const element = page.querySelector("#" + key);
+                    element.value = infoSaved[key];
+                    element.setAttribute("value", infoSaved[key]);
+                }
+            }
+
+        }
+
+    });
+
 }
-constructOptions(kButtonColors);
+
+function savedetails() {
+
+    var myFormFieldsWithData = {
+        "userName": "",
+        "userPassword": "",
+        "companyCode": "",
+        "sellAtProfitPercent": "",
+        "sellAtLossProfitPercent": "",
+        "differenceValueWithPrevRecord": "",
+        "intervalCheck": "",
+        "walletBalance": "",
+        "walletQntyMultiplier": "",
+        "selProductType": "AMF"
+    };
+
+    var page = document.getElementById("frmMyDetails");
+
+    for (const key in myFormFieldsWithData) {
+        if (myFormFieldsWithData.hasOwnProperty(key)) {
+            const element = page.querySelector("#" + key);
+            myFormFieldsWithData[key] = element.value || element.getAttribute("value");
+        }
+    }
+
+
+    chrome.storage.sync.set({ siteInfo: JSON.stringify(myFormFieldsWithData) }, function () {
+        alert("Info Saved Successfully");
+    })
+}
+
+document.getElementById("save").onclick = function () {
+    savedetails();
+}
+
+
+loadPrevDetails();
+
+

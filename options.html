@@ -3,20 +3,57 @@
 
 <head>
     <style>
-        button {
-            height: 30px;
-            width: 30px;
-            outline: none;
-            margin: 10px;
-        }
+
     </style>
 </head>
 
 <body>
-    <div id="buttonDiv">
-    </div>
     <div>
-        <p>Choose a different background color!</p>
+
+        <section>
+            <fieldset>
+                <form id="frmMyDetails">
+                    <legend>User Name</legend>
+                    <input type="text" placeholder="Ener User Name" id="userName" />
+
+                    <legend>Password</legend>
+                    <input tyep="password" placeholder="Enter Password" id="userPassword" />
+
+                    <legend>Enter Company Code</legend>
+                    <input tyep="text" placeholder="Enter Company Code" id="companyCode" />
+
+                    <legend>Wallet Balance </legend>
+                    <input tyep="text" id="walletBalance" />
+
+                    <legend>Wallet Balance Multiplier (Qnty.) </legend>
+                    <input tyep="text" id="walletQntyMultiplier" />
+
+
+                    <legend>Enter Difference Value % </legend>
+                    <input tyep="text" id="differenceValueWithPrevRecord" />
+
+                    <legend>Enter Sell at Profit % </legend>
+                    <input tyep="text" id="sellAtProfitPercent" />
+
+                    <legend>Enter Sell at Loss Profit</legend>
+                    <input tyep="text" id="sellAtLossProfitPercent" />
+
+                    <legend>Interval Check (In ms(milli seconds))</legend>
+                    <input type="number" value="2000" id="intervalCheck" />
+
+                    <legend>Select Product Type</legend>
+                    <select id="selProductType">
+                        <option value="AMF">Auto Margin(AMF)</option>
+                        <option value="MF">Margin(MF)</option>
+                    </select>
+                    <br />
+                    <br />
+                    <button id="save" type="button">Save</button>
+                </form>
+            </fieldset>
+        </section>
+
+
     </div>
 </body>
 <script src="options.js"></script>

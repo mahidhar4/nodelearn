@@ -1,7 +1,7 @@
 {
-    "name": "Trade Auto",
-    "version": "1.0",
-    "description": "Auto Trading Extension",
+    "name": "Trade Auto 2",
+    "version": "2.0",
+    "description": "Auto Trading Extension 2",
     "manifest_version": 2,
     "background": {
         "scripts": [
@@ -9,26 +9,17 @@
         ],
         "persistent": false
     },
+    "browser_action": {
+        "default_popup": "popup.html"
+    },
     "permissions": [
         "activeTab",
         "declarativeContent",
-        "storage"
+        "storage",
+        "contextMenus"
     ],
-    "page_action": {
-        "default_popup": "popup.html"
-    },
     "optional_permissions": [
         "tabs"
     ],
-    "options_page": "options.html",
-    "content_scripts": [
-        {
-            "matches": [
-                "<all_urls>"
-            ],
-            "js": [
-                "content.js"
-            ]
-        }
-    ]
+    "options_page": "options.html"
 }

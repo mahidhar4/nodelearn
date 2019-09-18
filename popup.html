@@ -1,16 +1,25 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <style>
-      button {
-        height: 30px;
-        width: 30px;
-        outline: none;
-      }
-    </style>
-  </head>
-  <body>
-    <button id="changeColor"></button>
-    <script src="popup.js"></script>
-  </body>
+
+<head>
+  <style>
+    button {
+      color: whitesmoke;
+      background-color: #128ed6;
+      padding: 2px;
+      margin: 1px;
+    }
+  </style>
+</head>
+
+<body>
+  <button id="gotsite">Load Site</button>
+  <button id="login">Login</button>
+  <button id="navigateme" style="display: none">Navigate</button>
+  <button id="executeScriptStart">Start Execution</button>
+  <button id="executeScriptStop" style="display: none">Stop Execution</button>
+
+  <script src="popup.js"></script>
+</body>
+
 </html>
